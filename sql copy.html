@@ -541,8 +541,13 @@ const Admin = (() => {
 
   function open() {
   document.getElementById('admin-panel').classList.add('show');
+
+  // 🔥 Always reset lock when opening
+  unlocked = false;
+
   render();
-  setTimeout(() => refresh(), 100);
+
+  // refresh only after unlock
   }
   function close() {
     document.getElementById('admin-panel').classList.remove('show');
@@ -563,9 +568,19 @@ const Admin = (() => {
     renderDashboard(body);
   }
   function unlock() {
-    const val = document.getElementById('admin-pw')?.value || '';
-    if (val === ADMIN_PASSWORD) { unlocked = true; render(); }
-    else { const e = document.getElementById('admin-pw-err'); if(e) e.textContent = '✗ Incorrect password'; }
+  const val = document.getElementById('admin-pw')?.value || '';
+
+  if (val === ADMIN_PASSWORD) {
+    unlocked = true;
+    render();
+
+    // 🔥 ADD THIS LINE (important)
+    setTimeout(() => Admin.refresh(), 100);
+
+  } else {
+    const e = document.getElementById('admin-pw-err');
+    if (e) e.textContent = 'Incorrect password';
+  }
   }
   function renderDashboard(body) {
     const sessions = lsRead();
